@@ -1,51 +1,42 @@
 {
 	"version": 1,
+	"license": "CC-BY-SA-3.0",
+  "copyright": "Taken from cev-eris at https://github.com/discordia-space/CEV-Eris/commit/740ff31a81313086cf16761f3677cf1e2ab46c93",
 	"size": {
 		"x": 32,
 		"y": 32
 	},
 	"states": [
 		{
-			"name": "brutepack",
-			"directions": 1,
-			"delays": [
-				[1.0]
-			]
+			"name": "brutepack"
 		},
 		{
-			"name": "cast",
-			"directions": 1,
-			"delays": [
-				[1.0]
-			]
+			"name": "brutepack-inhand-left",
+			"directions": 4
 		},
 		{
-			"name": "gauze",
-			"directions": 1,
-			"delays": [
-				[1.0]
-			]
+			"name": "brutepack-inhand-right",
+			"directions": 4
 		},
 		{
-			"name": "medkit_r",
-			"directions": 1,
-			"delays": [
-				[1.0]
-			]
+			"name": "cast"
 		},
 		{
-			"name": "morphine",
-			"directions": 1,
-			"delays": [
-				[1.0]
-			]
+			"name": "gauze"
 		},
 		{
-			"name": "ointment", 
-			"directions": 1,
-			"delays": [
-				[1.0]
-			]
+			"name": "morphine"
+		},
+		{
+			"name": "ointment"
+		},
+		{
+			"name": "ointment-inhand-left",
+			"directions": 4
+		},
+		{
+			"name": "ointment-inhand-right",
+			"directions": 4
 		}
 	]
 }

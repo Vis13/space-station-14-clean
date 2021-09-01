@@ -1,9 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Content.Server.GameObjects.EntitySystems.AI.Pathfinding;
+using Content.Server.AI.Pathfinding;
 using NUnit.Framework;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.Map;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;

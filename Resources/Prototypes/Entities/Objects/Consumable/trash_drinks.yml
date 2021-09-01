@@ -1,4 +1,4 @@
-﻿# These can still be used as containers
+# These can still be used as containers
 - type: entity
   name: base empty bottle
   parent: BaseItem
@@ -6,18 +6,21 @@
   id: DrinkBottleBaseEmpty
   description: That's an empty bottle.
   components:
-  - type: LoopingSound
   - type: Sprite
     state: icon
-
   - type: SolutionContainer
     maxVol: 10
-    caps: AddTo, RemoveFrom
-  - type: Pourable
-    transferAmount: 5
+  - type: SolutionTransfer
+    canChangeTransferAmount: true
+    maxTransferAmount: 5
   - type: Drink
     isOpen: true
   - type: Spillable
+  - type: UserInterface
+    interfaces:
+    - key: enum.TransferAmountUiKey.Key
+      type: TransferAmountBoundUserInterface
+
 
 
 # Containers

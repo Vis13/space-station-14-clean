@@ -1,20 +1,19 @@
-﻿#nullable enable
-using Content.Server.GameTicking;
-using Content.Server.Interfaces.GameTicking;
+﻿using Content.Server.GameTicking;
 using Content.Shared.Administration;
-using Robust.Server.Interfaces.Console;
-using Robust.Server.Interfaces.Player;
+using Robust.Server.Player;
+using Robust.Shared.Console;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 
 namespace Content.Server.Administration.Commands
 {
     [AdminCommand(AdminFlags.Server)]
-    public class ReadyAll : IClientCommand
+    public class ReadyAll : IConsoleCommand
     {
         public string Command => "readyall";
         public string Description => "Readies up all players in the lobby.";
         public string Help => $"{Command} | ̣{Command} <ready>";
-        public void Execute(IConsoleShell shell, IPlayerSession? player, string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             var ready = true;
 
@@ -23,13 +22,13 @@ namespace Content.Server.Administration.Commands
                 ready = bool.Parse(args[0]);
             }
 
-            var gameTicker = IoCManager.Resolve<IGameTicker>();
+            var gameTicker = EntitySystem.Get<GameTicker>();
             var playerManager = IoCManager.Resolve<IPlayerManager>();
 
 
             if (gameTicker.RunLevel != GameRunLevel.PreRoundLobby)
             {
-                shell.SendText(player, "This command can only be ran while in the lobby!");
+                shell.WriteLine("This command can only be ran while in the lobby!");
                 return;
             }
 

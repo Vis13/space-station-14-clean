@@ -20,13 +20,12 @@
   - type: ItemStatus
   - type: SolutionContainer
     maxVol: 100
-    caps: AddTo, NoExamine
+    caps: Refillable
     contents:
       reagents:
-        - ReagentId: chem.WeldingFuel
+        - ReagentId: WeldingFuel
           Quantity: 100
   - type: Welder
-    weldSoundCollection: Welder
   - type: PointLight
     enabled: false
     radius: 1.5
@@ -44,10 +43,10 @@
     sprite: Objects/Tools/welder_experimental.rsi
   - type: SolutionContainer
     maxVol: 1000
-    caps: AddTo, NoExamine
+    caps: Refillable
     contents:
       reagents:
-        - ReagentId: chem.WeldingFuel
+        - ReagentId: WeldingFuel
           Quantity: 1000
   - type: PointLight
     enabled: false
@@ -66,10 +65,10 @@
     sprite: Objects/Tools/welder_mini.rsi
   - type: SolutionContainer
     maxVol: 25
-    caps: AddTo, NoExamine
+    caps: Refillable
     contents:
       reagents:
-        - ReagentId: chem.WeldingFuel
+        - ReagentId: WeldingFuel
           Quantity: 25
   - type: PointLight
     enabled: false

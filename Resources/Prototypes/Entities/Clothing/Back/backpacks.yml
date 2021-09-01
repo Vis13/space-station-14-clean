@@ -15,6 +15,8 @@
     sprite: Clothing/Back/Backpacks/backpack.rsi
   - type: Storage
     capacity: 100
+    storageSoundCollection:
+      collection: storageRustle
 
 - type: entity
   parent: ClothingBackpack
@@ -95,7 +97,7 @@
 
 - type: entity
   parent: ClothingBackpack
-  id: ClothingBackpackBotany
+  id: ClothingBackpackHydroponics
   name: botany backpack
   description: It's a backpack made of all-natural fibers.
   components:
@@ -130,4 +132,5 @@
       shader: unshaded
   - type: Clothing
     sprite: Clothing/Back/Backpacks/holding.rsi
-    HeldPrefix: holding
+  - type: Storage
+    capacity: 10000

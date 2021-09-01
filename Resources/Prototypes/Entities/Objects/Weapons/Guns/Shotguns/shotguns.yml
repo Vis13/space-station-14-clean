@@ -24,15 +24,18 @@
     maxAngle: 60
     angleIncrease: 30
     angleDecay: 30
-    soundGunshot: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
-    soundEmpty: /Audio/Weapons/Guns/Empty/empty.ogg
-    soundInsert: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
+    soundEmpty:
+      path: /Audio/Weapons/Guns/Empty/empty.ogg
+    soundInsert:
+      path: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
 
 - type: entity
   name: Bojevic
   parent: ShotgunBase
   id: ShotgunBojevic
-  description: It's a magazine-fed shotgun designed for close quarters combat, nicknamed 'Striker' by boarding parties. A robust and reliable design allows you to swap magazines on the go and dump as many shells at your foes as you want... if you can manage the recoil, of course.
+  description: It's a magazine-fed shotgun designed for close quarters combat.
   components:
   - type: Sprite
     netsync: false
@@ -58,13 +61,20 @@
     magazineTypes:
     - Rifle
     magFillPrototype: MagazineShotgun
-    soundGunshot: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
-    soundEmpty: /Audio/Weapons/Guns/Empty/empty.ogg
-    soundRack: /Audio/Weapons/Guns/Cock/smg_cock.ogg
-    soundBoltOpen: /Audio/Weapons/Guns/Bolt/rifle_bolt_open.ogg
-    soundBoltClosed: /Audio/Weapons/Guns/Bolt/rifle_bolt_closed.ogg
-    soundMagInsert: /Audio/Weapons/Guns/MagIn/smg_magin.ogg
-    soundMagEject: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
+    soundEmpty:
+      path: /Audio/Weapons/Guns/Empty/empty.ogg
+    soundRack:
+      path: /Audio/Weapons/Guns/Cock/smg_cock.ogg
+    soundBoltOpen:
+      path: /Audio/Weapons/Guns/Bolt/rifle_bolt_open.ogg
+    soundBoltClosed:
+      path: /Audio/Weapons/Guns/Bolt/rifle_bolt_closed.ogg
+    soundMagInsert:
+      path: /Audio/Weapons/Guns/MagIn/smg_magin.ogg
+    soundMagEject:
+      path: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
   - type: Appearance
     visuals:
     - type: BarrelBoltVisualizer
@@ -92,7 +102,6 @@
   - type: Item
     size: 24
     sprite: Objects/Weapons/Guns/Shotguns/db_shotgun.rsi
-    state: icon
   - type: RangedWeapon
   - type: BoltActionBarrel
     caliber: Shotgun
@@ -107,11 +116,16 @@
     angleIncrease: 30
     angleDecay: 30
     ammoSpreadRatio: 0.7
-    soundGunshot: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
-    soundEmpty: /Audio/Weapons/Guns/Empty/empty.ogg
-    soundInsert: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
-    sound_bolt_open: /Audio/Weapons/Guns/Cock/shotgun_open.ogg
-    sound_bolt_closed: /Audio/Weapons/Guns/Cock/shotgun_close.ogg
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
+    soundEmpty:
+      path: /Audio/Weapons/Guns/Empty/empty.ogg
+    soundInsert:
+      path: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
+    soundBoltOpen:
+      path: /Audio/Weapons/Guns/Cock/shotgun_open.ogg
+    soundBoltClosed:
+      path: /Audio/Weapons/Guns/Cock/shotgun_close.ogg
   - type: Appearance
     visuals:
     - type: BarrelBoltVisualizer
@@ -120,7 +134,7 @@
   name: Bull
   parent: ShotgunBase
   id: ShotgunBull
-  description: A Frozen Star pump-action shotgun. A marvel of engineering, this gun is often used by Ironhammer tactical units. Due to shorter than usual barrels, recoil kicks slightly harder.
+  description: A Frozen Star pump-action shotgun.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/bull.rsi
@@ -150,7 +164,7 @@
   name: Gladstone
   parent: ShotgunBase
   id: ShotgunGladstone
-  description: It is a next-generation Frozen Star shotgun intended as a cost-effective competitor to the aging NT "Regulator 1000". It has a semi-rifled lightweight full-length barrel which gives it exceptional accuracy with all types of ammunition, with a high-capacity magazine tube below it.
+  description: A next-generation Frozen Star shotgun.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/gladstone.rsi
@@ -167,7 +181,7 @@
   name: Regulator 1000
   parent: ShotgunBase
   id: ShotgunRegulator
-  description: Designed for close quarters combat, the Regulator is widely regarded as a weapon of choice for repelling boarders. Some may say that it's too old, but it actually proved itself useful.
+  description: Ol' reliable.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/regulator.rsi
@@ -216,7 +230,6 @@
   - type: Item
     size: 24
     sprite: Objects/Weapons/Guns/Shotguns/sawn.rsi
-    state: icon
   - type: RangedWeapon
   - type: BoltActionBarrel
     caliber: Shotgun
@@ -230,11 +243,16 @@
     maxAngle: 90
     angleIncrease: 45
     angleDecay: 30
-    soundGunshot: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
-    soundEmpty: /Audio/Weapons/Guns/Empty/empty.ogg
-    soundInsert: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
-    soundBoltOpen: /Audio/Weapons/Guns/Cock/shotgun_open.ogg
-    soundBoltClosed: /Audio/Weapons/Guns/Cock/shotgun_close.ogg
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
+    soundEmpty:
+      path: /Audio/Weapons/Guns/Empty/empty.ogg
+    soundInsert:
+      path: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
+    soundBoltOpen:
+      path: /Audio/Weapons/Guns/Cock/shotgun_open.ogg
+    soundBoltClosed:
+      path: /Audio/Weapons/Guns/Cock/shotgun_close.ogg
   - type: Appearance
     visuals:
     - type: BarrelBoltVisualizer

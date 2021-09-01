@@ -1,44 +1,43 @@
-using Content.Server.GameObjects.Components.Mobs;
-using Content.Server.GameObjects.Components.Observer;
+using Content.Server.Mind.Components;
 using Content.Server.Players;
 using Content.Shared.Administration;
-using Robust.Server.Interfaces.Console;
-using Robust.Server.Interfaces.Player;
+using Robust.Server.Player;
+using Robust.Shared.Console;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Localization;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Administration.Commands
 {
     [AdminCommand(AdminFlags.Admin)]
-    class ControlMob : IClientCommand
+    class ControlMob : IConsoleCommand
     {
         public string Command => "controlmob";
-        public string Description => Loc.GetString("Transfers user mind to the specified entity.");
-        public string Help => Loc.GetString("Usage: controlmob <mobUid>.");
+        public string Description => Loc.GetString("control-mob-command-description");
+        public string Help => Loc.GetString("control-mob-command-help-text");
 
-        public void Execute(IConsoleShell shell, IPlayerSession player, string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
+            var player = shell.Player as IPlayerSession;
             if (player == null)
             {
-                shell.SendText((IPlayerSession) null, "Server cannot do this.");
+                shell.WriteLine("shell-server-cannot");
                 return;
             }
 
             if (args.Length != 1)
             {
-                shell.SendText(player, Loc.GetString("Wrong number of arguments."));
+                shell.WriteLine(Loc.GetString("shell-wrong-arguments-number"));
                 return;
             }
 
 
-            var mind = player.ContentData().Mind;
             var entityManager = IoCManager.Resolve<IEntityManager>();
 
             if (!int.TryParse(args[0], out var targetId))
             {
-                shell.SendText(player, Loc.GetString("Argument must be a number."));
+                shell.WriteLine(Loc.GetString("shell-argument-must-be-number"));
                 return;
             }
 
@@ -46,25 +45,23 @@ namespace Content.Server.Administration.Commands
 
             if (!eUid.IsValid() || !entityManager.EntityExists(eUid))
             {
-                shell.SendText(player, Loc.GetString("Invalid entity ID."));
+                shell.WriteLine(Loc.GetString("shell-invalid-entity-id"));
                 return;
             }
 
             var target = entityManager.GetEntity(eUid);
-            if (!target.TryGetComponent(out MindComponent mindComponent))
+            if (!target.TryGetComponent(out MindComponent? mindComponent))
             {
-                shell.SendText(player, Loc.GetString("Target entity is not a mob!"));
+                shell.WriteLine(Loc.GetString("shell-entity-is-not-mob"));
                 return;
             }
 
-            var oldEntity = mind.CurrentEntity;
+            var mind = player.ContentData()?.Mind;
+
+            DebugTools.AssertNotNull(mind);
 
             mindComponent.Mind?.TransferTo(null);
-            mind.TransferTo(target);
-
-            if(oldEntity.HasComponent<GhostComponent>())
-                oldEntity.Delete();
-
+            mind!.TransferTo(target);
         }
     }
 }

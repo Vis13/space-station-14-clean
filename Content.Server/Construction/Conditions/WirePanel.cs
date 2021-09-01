@@ -1,42 +1,39 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Content.Server.GameObjects.Components;
+using Content.Server.WireHacking;
 using Content.Shared.Construction;
 using JetBrains.Annotations;
-using Robust.Shared.Interfaces.GameObjects;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Localization;
-using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Utility;
 
 namespace Content.Server.Construction.Conditions
 {
     [UsedImplicitly]
-    public class WirePanel : IEdgeCondition
+    [DataDefinition]
+    public class WirePanel : IGraphCondition
     {
-        public bool Open { get; private set; }
-
-        public void ExposeData(ObjectSerializer serializer)
-        {
-            serializer.DataField(this, x => x.Open, "open", true);
-        }
+        [DataField("open")] public bool Open { get; private set; } = true;
 
         public async Task<bool> Condition(IEntity entity)
         {
-            if (!entity.TryGetComponent(out WiresComponent wires)) return false;
+            if (!entity.TryGetComponent(out WiresComponent? wires)) return false;
 
             return wires.IsPanelOpen == Open;
         }
 
         public bool DoExamine(IEntity entity, FormattedMessage message, bool inDetailsRange)
         {
-            if (!entity.TryGetComponent(out WiresComponent wires)) return false;
+            if (!entity.TryGetComponent(out WiresComponent? wires)) return false;
 
             switch (Open)
             {
                 case true when !wires.IsPanelOpen:
-                    message.AddMarkup(Loc.GetString("First, open the maintenance panel.\n"));
+                    message.AddMarkup(Loc.GetString("construction-condition-wire-panel-open") + "\n");
                     return true;
                 case false when wires.IsPanelOpen:
-                    message.AddMarkup(Loc.GetString("First, close the maintenance panel.\n"));
+                    message.AddMarkup(Loc.GetString("construction-condition-wire-panel-close") + "\n");
                     return true;
             }
 

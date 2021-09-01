@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
-using Content.Server.GameObjects.Components.GUI;
-using Content.Server.GameObjects.Components.Items.Storage;
-using Content.Server.GameObjects.Components.Mobs;
-using Content.Server.Utility;
+using Content.Server.Inventory;
+using Content.Server.Inventory.Components;
+using Content.Server.Items;
+using Content.Server.Stunnable.Components;
 using NUnit.Framework;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
-using static Content.Shared.GameObjects.Components.Inventory.EquipmentSlotDefines;
+using static Content.Shared.Inventory.EquipmentSlotDefines;
 
 namespace Content.IntegrationTests.Tests
 {
@@ -16,7 +15,7 @@ namespace Content.IntegrationTests.Tests
     [TestOf(typeof(InventoryHelpers))]
     public class InventoryHelpersTest : ContentIntegrationTest
     {
-        private const string PROTOTYPES = @"
+        private const string Prototypes = @"
 - type: entity
   name: InventoryStunnableDummy
   id: InventoryStunnableDummy
@@ -45,7 +44,7 @@ namespace Content.IntegrationTests.Tests
         [Test]
         public async Task SpawnItemInSlotTest()
         {
-            var options = new ServerIntegrationOptions {ExtraPrototypes = PROTOTYPES};
+            var options = new ServerIntegrationOptions {ExtraPrototypes = Prototypes};
             var server = StartServerDummyTicker(options);
 
             IEntity human = null;
@@ -83,7 +82,7 @@ namespace Content.IntegrationTests.Tests
                 Assert.That(inventory.TryGetSlotItem(Slots.IDCARD, out ItemComponent _), Is.False);
 
                 // Let's try skipping the interaction check and see if it equips it!
-                Assert.That(inventory.SpawnItemInSlot(Slots.IDCARD, "InventoryIDCardDummy", false));
+                Assert.That(inventory.SpawnItemInSlot(Slots.IDCARD, "InventoryIDCardDummy"));
                 Assert.That(inventory.TryGetSlotItem(Slots.IDCARD, out ItemComponent id));
                 Assert.That(id.Owner.Prototype != null && id.Owner.Prototype.ID == "InventoryIDCardDummy");
             });

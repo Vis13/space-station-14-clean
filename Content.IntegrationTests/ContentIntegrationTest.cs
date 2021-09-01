@@ -1,18 +1,25 @@
 using System;
 using System.Threading.Tasks;
-using Content.Client;
-using Content.Client.Interfaces.Parallax;
-using Content.Server;
-using Content.Server.Interfaces.GameTicking;
+using Content.Client.IoC;
+using Content.Client.Parallax.Managers;
+using Content.Server.GameTicking;
+using Content.Server.IoC;
+using Content.Shared.CCVar;
+using Moq;
 using NUnit.Framework;
-using Robust.Server.Interfaces.Maps;
-using Robust.Server.Interfaces.Timing;
+using Robust.Client;
+using Robust.Server;
+using Robust.Server.Maps;
+using Robust.Shared;
 using Robust.Shared.ContentPack;
-using Robust.Shared.Interfaces.Map;
-using Robust.Shared.Interfaces.Network;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
+using Robust.Shared.Log;
 using Robust.Shared.Map;
+using Robust.Shared.Network;
+using Robust.Shared.Timing;
 using Robust.UnitTesting;
+using EntryPoint = Content.Client.Entry.EntryPoint;
 
 namespace Content.IntegrationTests
 {
@@ -21,12 +28,24 @@ namespace Content.IntegrationTests
     {
         protected sealed override ClientIntegrationInstance StartClient(ClientIntegrationOptions options = null)
         {
-            options ??= new ClientIntegrationOptions();
-            // ReSharper disable once RedundantNameQualifier
+            options ??= new ClientContentIntegrationOption()
+            {
+                FailureLogLevel = LogLevel.Warning
+            };
+
+            // Load content resources, but not config and user data.
+            options.Options = new GameControllerOptions()
+            {
+                LoadContentResources = true,
+                LoadConfigAndUserData = false,
+            };
+
+            options.ContentStart = true;
+
             options.ContentAssemblies = new[]
             {
-                typeof(Shared.EntryPoint).Assembly,
-                typeof(Client.EntryPoint).Assembly,
+                typeof(Shared.Entry.EntryPoint).Assembly,
+                typeof(EntryPoint).Assembly,
                 typeof(ContentIntegrationTest).Assembly
             };
 
@@ -42,26 +61,37 @@ namespace Content.IntegrationTests
                         }
 
                         IoCManager.Register<IParallaxManager, DummyParallaxManager>(true);
+                        IoCManager.Resolve<ILogManager>().GetSawmill("loc").Level = LogLevel.Error;
                     }
                 });
             };
-
-            // Connecting to Discord is a massive waste of time.
-            // Basically just makes the CI logs a mess.
-            options.CVarOverrides["discord.enabled"] = "true";
 
             return base.StartClient(options);
         }
 
         protected override ServerIntegrationInstance StartServer(ServerIntegrationOptions options = null)
         {
-            options ??= new ServerIntegrationOptions();
+            options ??= new ServerContentIntegrationOption()
+            {
+                FailureLogLevel = LogLevel.Warning
+            };
+
+            // Load content resources, but not config and user data.
+            options.Options = new ServerOptions()
+            {
+                LoadConfigAndUserData = false,
+                LoadContentResources = true,
+            };
+
+            options.ContentStart = true;
+
             options.ContentAssemblies = new[]
             {
-                typeof(Shared.EntryPoint).Assembly,
-                typeof(Server.EntryPoint).Assembly,
+                typeof(Shared.Entry.EntryPoint).Assembly,
+                typeof(Server.Entry.EntryPoint).Assembly,
                 typeof(ContentIntegrationTest).Assembly
             };
+
             options.BeforeStart += () =>
             {
                 IoCManager.Resolve<IModLoader>().SetModuleBaseCallbacks(new ServerModuleTestingCallbacks
@@ -74,24 +104,36 @@ namespace Content.IntegrationTests
                         }
                     }
                 });
+
+                IoCManager.Resolve<ILogManager>().GetSawmill("loc").Level = LogLevel.Error;
             };
+
+            // Avoid funny race conditions with the database.
+            options.CVarOverrides[CCVars.DatabaseSynchronous.Name] = "true";
+
+            // Disable holidays as some of them might mess with the map at round start.
+            options.CVarOverrides[CCVars.HolidaysEnabled.Name] = "false";
+
+            // Avoid loading a large map by default for integration tests if none has been specified.
+            if(!options.CVarOverrides.ContainsKey(CCVars.GameMap.Name))
+                options.CVarOverrides[CCVars.GameMap.Name] = "Maps/Test/empty.yml";
 
             return base.StartServer(options);
         }
 
         protected ServerIntegrationInstance StartServerDummyTicker(ServerIntegrationOptions options = null)
         {
-            options ??= new ServerIntegrationOptions();
-            options.BeforeStart += () =>
+            options ??= new ServerContentIntegrationOption();
+
+            // Load content resources, but not config and user data.
+            options.Options = new ServerOptions()
             {
-                IoCManager.Resolve<IModLoader>().SetModuleBaseCallbacks(new ServerModuleTestingCallbacks
-                {
-                    ServerBeforeIoC = () =>
-                    {
-                        IoCManager.Register<IGameTicker, DummyGameTicker>(true);
-                    }
-                });
+                LoadConfigAndUserData = false,
+                LoadContentResources = true,
             };
+
+            // Dummy game ticker.
+            options.CVarOverrides[CCVars.GameDummyTicker.Name] = "true";
 
             return StartServer(options);
         }
@@ -199,11 +241,33 @@ namespace Content.IntegrationTests
 
         protected sealed class ClientContentIntegrationOption : ClientIntegrationOptions
         {
+            public ClientContentIntegrationOption()
+            {
+                FailureLogLevel = LogLevel.Warning;
+            }
+
+            public override GameControllerOptions Options { get; set; } = new()
+            {
+                LoadContentResources = true,
+                LoadConfigAndUserData = false,
+            };
+
             public Action ContentBeforeIoC { get; set; }
         }
 
         protected sealed class ServerContentIntegrationOption : ServerIntegrationOptions
         {
+            public ServerContentIntegrationOption()
+            {
+                FailureLogLevel = LogLevel.Warning;
+            }
+
+            public override ServerOptions Options { get; set; } = new()
+            {
+                LoadContentResources = true,
+                LoadConfigAndUserData = false,
+            };
+
             public Action ContentBeforeIoC { get; set; }
         }
     }

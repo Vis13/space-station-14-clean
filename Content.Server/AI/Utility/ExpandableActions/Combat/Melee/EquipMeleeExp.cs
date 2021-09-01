@@ -7,7 +7,7 @@ using Content.Server.AI.Utility.Considerations.Combat.Melee;
 using Content.Server.AI.WorldState;
 using Content.Server.AI.WorldState.States;
 using Content.Server.AI.WorldState.States.Inventory;
-using Content.Server.GameObjects.Components.Weapon.Melee;
+using Content.Server.Weapon.Melee.Components;
 using Robust.Shared.IoC;
 
 namespace Content.Server.AI.Utility.ExpandableActions.Combat.Melee
@@ -37,8 +37,8 @@ namespace Content.Server.AI.Utility.ExpandableActions.Combat.Melee
                 {
                     continue;
                 }
-                
-                yield return new EquipMelee(owner, entity, Bonus);
+
+                yield return new EquipMelee {Owner = owner, Target = entity, Bonus = Bonus};
             }
         }
     }

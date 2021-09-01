@@ -1,6 +1,6 @@
 using Content.Server.AI.WorldState;
 using Content.Server.AI.WorldState.States;
-using Content.Server.GameObjects.Components.GUI;
+using Content.Server.Hands.Components;
 
 namespace Content.Server.AI.Utility.Considerations.Hands
 {
@@ -10,7 +10,7 @@ namespace Content.Server.AI.Utility.Considerations.Hands
         {
             var owner = context.GetState<SelfState>().GetValue();
 
-            if (!owner.TryGetComponent(out HandsComponent handsComponent))
+            if (owner == null || !owner.TryGetComponent(out HandsComponent? handsComponent))
             {
                 return 0.0f;
             }

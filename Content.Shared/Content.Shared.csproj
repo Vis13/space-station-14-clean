@@ -6,14 +6,14 @@
     <LangVersion>9</LangVersion>
     <IsPackable>false</IsPackable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>../bin/Content.Shared</OutputPath>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU</Platforms>
-    <WarningsAsErrors>CS8604;CS8765;CS8632;CS8622</WarningsAsErrors>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <Import Project="..\RobustToolbox\MSBuild\Robust.DefineConstants.targets" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RobustToolbox\Lidgren.Network\Lidgren.Network.csproj">
@@ -27,8 +27,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GameObjects\Components\Trigger\" />
     <EmbeddedResource Include="Text\Names\*.txt" />
-    <Folder Include="GameObjects\Components\Visualizers" />
   </ItemGroup>
+  <Import Project="..\RobustToolbox\MSBuild\Robust.Analyzers.targets" />
+
 </Project>

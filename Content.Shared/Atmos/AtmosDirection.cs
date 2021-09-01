@@ -87,15 +87,15 @@ namespace Content.Shared.Atmos
         {
             return direction switch
             {
-                AtmosDirection.East => Angle.FromDegrees(0),
-                AtmosDirection.North => Angle.FromDegrees(90),
-                AtmosDirection.West => Angle.FromDegrees(180),
-                AtmosDirection.South => Angle.FromDegrees(270),
+                AtmosDirection.East => Angle.FromDegrees(90),
+                AtmosDirection.North => Angle.FromDegrees(180),
+                AtmosDirection.West => Angle.FromDegrees(270),
+                AtmosDirection.South => Angle.FromDegrees(0),
 
-                AtmosDirection.NorthEast => Angle.FromDegrees(45),
-                AtmosDirection.NorthWest => Angle.FromDegrees(135),
-                AtmosDirection.SouthWest => Angle.FromDegrees(225),
-                AtmosDirection.SouthEast => Angle.FromDegrees(315),
+                AtmosDirection.NorthEast => Angle.FromDegrees(135),
+                AtmosDirection.NorthWest => Angle.FromDegrees(205),
+                AtmosDirection.SouthWest => Angle.FromDegrees(315),
+                AtmosDirection.SouthEast => Angle.FromDegrees(45),
 
                 _ => throw new ArgumentOutOfRangeException(nameof(direction), $"It was {direction}."),
             };
@@ -141,6 +141,28 @@ namespace Content.Shared.Atmos
         public static bool IsFlagSet(this AtmosDirection direction, AtmosDirection other)
         {
             return (direction & other) == other;
+        }
+
+        public static Vector2i CardinalToIntVec(this Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.North:
+                    return new Vector2i(0, 1);
+                case Direction.East:
+                    return new Vector2i(1, 0);
+                case Direction.South:
+                    return new Vector2i(0, -1);
+                case Direction.West:
+                    return new Vector2i(-1, 0);
+                default:
+                    throw new ArgumentException($"Direction dir {dir} is not a cardinal direction", nameof(dir));
+            }
+        }
+
+        public static Vector2i Offset(this Vector2i pos, Direction dir)
+        {
+            return pos + dir.CardinalToIntVec();
         }
     }
 

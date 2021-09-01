@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using Content.Server.AI.Components;
 using Content.Server.AI.Utils;
-using Content.Server.GameObjects.Components.Movement;
-using Content.Server.GameObjects.Components.Weapon.Melee;
+using Content.Server.Weapon.Melee.Components;
 using JetBrains.Annotations;
-using Robust.Shared.Interfaces.GameObjects;
+using Robust.Shared.GameObjects;
 
 namespace Content.Server.AI.WorldState.States.Combat.Nearby
 {
@@ -16,7 +16,7 @@ namespace Content.Server.AI.WorldState.States.Combat.Nearby
         {
             var result = new List<IEntity>();
 
-            if (!Owner.TryGetComponent(out AiControllerComponent controller))
+            if (!Owner.TryGetComponent(out AiControllerComponent? controller))
             {
                 return result;
             }

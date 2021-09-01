@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Content.Server.GameObjects.Components.GUI;
+using Content.Server.Hands.Components;
 using JetBrains.Annotations;
 
 namespace Content.Server.AI.WorldState.States.Hands
@@ -13,7 +13,7 @@ namespace Content.Server.AI.WorldState.States.Hands
         {
             var result = new List<string>();
 
-            if (!Owner.TryGetComponent(out HandsComponent handsComponent))
+            if (!Owner.TryGetComponent(out HandsComponent? handsComponent))
             {
                 return result;
             }

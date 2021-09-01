@@ -7,7 +7,7 @@ using Content.Server.AI.Utility.Considerations.Nutrition.Drink;
 using Content.Server.AI.WorldState;
 using Content.Server.AI.WorldState.States;
 using Content.Server.AI.WorldState.States.Inventory;
-using Content.Server.GameObjects.Components.Nutrition;
+using Content.Server.Nutrition.Components;
 using Robust.Shared.IoC;
 
 namespace Content.Server.AI.Utility.ExpandableActions.Nutrition
@@ -15,7 +15,7 @@ namespace Content.Server.AI.Utility.ExpandableActions.Nutrition
     public sealed class UseDrinkInInventoryExp : ExpandableUtilityAction
     {
         public override float Bonus => UtilityAction.NeedsBonus;
-        
+
         protected override IEnumerable<Func<float>> GetCommonConsiderations(Blackboard context)
         {
             var considerationsManager = IoCManager.Resolve<ConsiderationsManager>();
@@ -35,8 +35,8 @@ namespace Content.Server.AI.Utility.ExpandableActions.Nutrition
                 {
                     continue;
                 }
-                
-                yield return new UseDrinkInInventory(owner, entity, Bonus);
+
+                yield return new UseDrinkInInventory {Owner = owner, Target = entity, Bonus = Bonus};
             }
         }
     }

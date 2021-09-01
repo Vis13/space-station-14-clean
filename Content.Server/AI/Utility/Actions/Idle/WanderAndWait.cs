@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using Content.Server.AI.Operators;
 using Content.Server.AI.Operators.Generic;
 using Content.Server.AI.Operators.Movement;
+using Content.Server.AI.Pathfinding;
+using Content.Server.AI.Pathfinding.Accessible;
 using Content.Server.AI.Utility.Considerations;
 using Content.Server.AI.Utility.Considerations.ActionBlocker;
 using Content.Server.AI.WorldState;
-using Content.Server.GameObjects.EntitySystems.AI.Pathfinding;
-using Content.Server.GameObjects.EntitySystems.AI.Pathfinding.Accessible;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
-using Robust.Shared.Interfaces.Random;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
@@ -25,8 +22,6 @@ namespace Content.Server.AI.Utility.Actions.Idle
     {
         public override bool CanOverride => false;
         public override float Bonus => 1.0f;
-
-        public WanderAndWait(IEntity owner) : base(owner) {}
 
         public override void SetupOperators(Blackboard context)
         {

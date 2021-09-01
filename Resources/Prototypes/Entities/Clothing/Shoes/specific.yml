@@ -19,9 +19,9 @@
     sprite: Clothing/Shoes/Specific/clown.rsi
   - type: Clothing
     sprite: Clothing/Shoes/Specific/clown.rsi
-  - type: LoopingSound
   - type: FootstepModifier
-    footstepSoundCollection: footstep_clown
+    footstepSoundCollection:
+      collection: footstep_clown
 
 - type: entity
   parent: ClothingShoesBase
@@ -49,8 +49,8 @@
 - type: entity
   parent: ClothingShoesBase
   id: ClothingShoesSNinja
-  name: S ninja shoes
-  description: A pair of nano-enhanced oots with built-in magnetic suction cups.
+  name: space ninja shoes
+  description: A pair of nano-enhanced boots with built-in magnetic suction cups.
   components:
   - type: Sprite
     sprite: Clothing/Shoes/Specific/spaceninja.rsi
@@ -79,3 +79,11 @@
     sprite: Clothing/Shoes/Specific/wizard.rsi
   - type: Clothing
     sprite: Clothing/Shoes/Specific/wizard.rsi
+
+- type: entity
+  parent: ClothingShoesColorBlack
+  id: ClothingShoesChameleonNoSlips
+  name: no-slip shoes
+  description: These protect you from slips while looking like normal sneakers.
+  components:
+  - type: NoSlip

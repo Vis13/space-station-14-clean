@@ -1,33 +1,28 @@
-﻿#nullable enable
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Content.Shared.Construction;
 using JetBrains.Annotations;
 using Robust.Server.GameObjects;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Reflection;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
+using Robust.Shared.Reflection;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.Construction.Completions
 {
     [UsedImplicitly]
-    public class VisualizerDataInt : IGraphAction
+    [DataDefinition]
+    public class VisualizerDataInt : IGraphAction, ISerializationHooks
     {
         [Dependency] private readonly IReflectionManager _reflectionManager = default!;
 
-        public VisualizerDataInt()
+        void ISerializationHooks.AfterDeserialization()
         {
             IoCManager.InjectDependencies(this);
         }
 
-        public void ExposeData(ObjectSerializer serializer)
-        {
-            serializer.DataField(this, x => x.Key, "key", string.Empty);
-            serializer.DataField(this, x => x.Data, "data", 0);
-        }
-
-        public string? Key { get; private set; } = string.Empty;
-        public int Data { get; private set; } = 0;
+        [DataField("key")] public string Key { get; private set; } = string.Empty;
+        [DataField("data")] public int Data { get; private set; } = 0;
 
         public async Task PerformAction(IEntity entity, IEntity? user)
         {

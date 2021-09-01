@@ -1,39 +1,24 @@
-﻿#nullable enable
 using System.Threading.Tasks;
 using Content.Shared.Audio;
 using Content.Shared.Construction;
+using Content.Shared.Sound;
 using JetBrains.Annotations;
-using Robust.Server.GameObjects.EntitySystems;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Serialization;
+using Robust.Shared.Audio;
+using Robust.Shared.GameObjects;
+using Robust.Shared.Player;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.Construction.Completions
 {
     [UsedImplicitly]
+    [DataDefinition]
     public class PlaySound : IGraphAction
     {
-        public string SoundCollection { get; private set; } = string.Empty;
-        public string Sound { get; private set; } = string.Empty;
-
-        public void ExposeData(ObjectSerializer serializer)
-        {
-            serializer.DataField(this, x => x.Sound, "sound", string.Empty);
-            serializer.DataField(this, x => x.SoundCollection, "soundCollection", string.Empty);
-        }
+        [DataField("sound", required: true)] public SoundSpecifier Sound { get; private set; } = default!;
 
         public async Task PerformAction(IEntity entity, IEntity? user)
         {
-            var sound = GetSound();
-
-            if (string.IsNullOrEmpty(sound)) return;
-
-            EntitySystem.Get<AudioSystem>().PlayFromEntity(sound, entity, AudioHelpers.WithVariation(0.125f));
-        }
-
-        private string GetSound()
-        {
-            return !string.IsNullOrEmpty(SoundCollection) ? AudioHelpers.GetRandomFileFromSoundCollection(SoundCollection) : Sound;
+            SoundSystem.Play(Filter.Pvs(entity), Sound.GetSound(), entity, AudioHelpers.WithVariation(0.125f));
         }
     }
 }

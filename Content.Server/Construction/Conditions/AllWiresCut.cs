@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Content.Server.GameObjects.Components;
-using Content.Server.GameObjects.Components.Power;
+using Content.Server.WireHacking;
 using Content.Shared.Construction;
 using JetBrains.Annotations;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Serialization;
+using Robust.Shared.GameObjects;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.Construction.Conditions
 {
@@ -13,14 +13,10 @@ namespace Content.Server.Construction.Conditions
     ///     Returns true if the entity doesn't have a wires component.
     /// </summary>
     [UsedImplicitly]
-    public class AllWiresCut : IEdgeCondition
+    [DataDefinition]
+    public class AllWiresCut : IGraphCondition
     {
-        public void ExposeData(ObjectSerializer serializer)
-        {
-            serializer.DataField(this, x => x.Value, "value", true);
-        }
-
-        public bool Value { get; private set; } = true;
+        [DataField("value")] public bool Value { get; private set; } = true;
 
         public async Task<bool> Condition(IEntity entity)
         {

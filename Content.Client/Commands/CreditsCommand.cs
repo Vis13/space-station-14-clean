@@ -1,6 +1,7 @@
+using Content.Client.Credits;
 using Content.Client.UserInterface;
 using JetBrains.Annotations;
-using Robust.Client.Interfaces.Console;
+using Robust.Shared.Console;
 
 namespace Content.Client.Commands
 {
@@ -11,10 +12,9 @@ namespace Content.Client.Commands
         public string Description => "Opens the credits window";
         public string Help => "credits";
 
-        public bool Execute(IDebugConsole console, params string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             new CreditsWindow().Open();
-            return false;
         }
     }
 }

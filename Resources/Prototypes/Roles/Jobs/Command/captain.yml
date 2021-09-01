@@ -4,7 +4,7 @@
   head: true
   positions: 1
   startingGear: CaptainGear
-  department:
+  departments:
   - Command
   icon: "Captain"
   access:
@@ -16,25 +16,18 @@
   - HeadOfPersonnel
   - Command
   - Security
-  - HeadOfSecurity
   - Brig
-  - Detective
-  - ChiefEngineer
   - Engineering
-  - ChiefMedicalOfficer
   - Medical
-  - Quartermaster
   - Cargo
   - ResearchDirector
   - Research
-  - Bar
-  - Kitchen
   - Service
-  - Hydroponics
   - Maintenance
   - External
   - Janitor
   - Theatre
+  - Bar
 
 - type: startingGear
   id: CaptainGear
@@ -48,3 +41,6 @@
     outerclothing: ClothingOuterHardsuitCap
     idcard: CaptainPDA
     ears: ClothingHeadsetAltCommand
+  innerclothingskirt: ClothingUniformJumpskirtCaptain
+  satchel: ClothingBackpackSatchelCaptainFilled
+  duffelbag: ClothingBackpackDuffelCaptainFilled

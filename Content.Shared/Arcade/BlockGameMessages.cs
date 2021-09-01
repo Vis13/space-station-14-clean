@@ -1,7 +1,6 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Robust.Shared.GameObjects.Components.UserInterface;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Arcade
@@ -57,9 +56,6 @@ namespace Content.Shared.Arcade
                 IsPlayer = isPlayer;
             }
         }
-
-        [Serializable, NetSerializable]
-        public class BlockGameUserUnregisterMessage : BoundUserInterfaceMessage{}
 
         [Serializable, NetSerializable]
         public class BlockGameSetScreenMessage : BoundUserInterfaceMessage

@@ -1,27 +1,25 @@
-﻿using Content.Server.GameObjects.Components;
-using Content.Server.Utility;
+﻿using System.Linq;
+using Content.Server.Cleanable;
+using Content.Server.Coordinates.Helpers;
+using Content.Server.GameObjects.Components;
 using Content.Shared.Chemistry;
-using Content.Shared.Interfaces.Chemistry;
-using Robust.Shared.Interfaces.Serialization;
+using Content.Shared.Chemistry.Reaction;
+using Content.Shared.Chemistry.Reagent;
 using Robust.Shared.Map;
-using Robust.Shared.Serialization;
-using System.Linq;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.Chemistry.TileReactions
 {
+    [DataDefinition]
     public class CleanTileReaction : ITileReaction
     {
-        void IExposeData.ExposeData(ObjectSerializer serializer)
-        {
-        }
-
         ReagentUnit ITileReaction.TileReact(TileRef tile, ReagentPrototype reagent, ReagentUnit reactVolume)
         {
             var entities = tile.GetEntitiesInTileFast().ToArray();
             var amount = ReagentUnit.Zero;
             foreach (var entity in entities)
             {
-                if (entity.TryGetComponent(out CleanableComponent cleanable))
+                if (entity.TryGetComponent(out CleanableComponent? cleanable))
                 {
                     var next = amount + cleanable.CleanAmount;
                     // Nothing left?
@@ -29,7 +27,7 @@ namespace Content.Server.Chemistry.TileReactions
                         break;
 
                     amount = next;
-                    entity.Delete();
+                    entity.QueueDelete();
                 }
             }
 

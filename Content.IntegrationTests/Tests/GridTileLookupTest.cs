@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Robust.Server.GameObjects.EntitySystems.TileLookup;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
+using Robust.Server.GameObjects;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
 
@@ -13,7 +12,7 @@ namespace Content.IntegrationTests.Tests
     [TestFixture]
     public class GridTileLookupTest : ContentIntegrationTest
     {
-        private const string PROTOTYPES = @"
+        private const string Prototypes = @"
 - type: entity
   name: Dummy
   id: Dummy
@@ -22,7 +21,7 @@ namespace Content.IntegrationTests.Tests
         [Test]
         public async Task Test()
         {
-            var options = new ServerIntegrationOptions{ExtraPrototypes = PROTOTYPES};
+            var options = new ServerIntegrationOptions{ExtraPrototypes = Prototypes};
             var server = StartServerDummyTicker(options);
             await server.WaitIdleAsync();
 
@@ -54,14 +53,12 @@ namespace Content.IntegrationTests.Tests
                 entityManager.SpawnEntity("Dummy", new EntityCoordinates(gridOne.GridEntityId, Vector2.One));
 
                 var entityTiles = tileLookup.GetIndices(entityOne);
-                Assert.That(entityTiles.Count, Is.EqualTo(4));
+                Assert.That(entityTiles.Count, Is.EqualTo(1));
 
                 entities = tileLookup.GetEntitiesIntersecting(entityOne).ToList();
-                Assert.That(entities.Count, Is.EqualTo(5));
-
-                // Both dummies should be in each corner of the 0,0 tile but only one dummy intersects -1,-1
-                entities = tileLookup.GetEntitiesIntersecting(gridOne.Index, new Vector2i(-1, -1)).ToList();
                 Assert.That(entities.Count, Is.EqualTo(1));
+
+                entityManager.SpawnEntity("Dummy", new EntityCoordinates(gridOne.GridEntityId, Vector2.Zero));
 
                 entities = tileLookup.GetEntitiesIntersecting(gridOne.Index, new Vector2i(0, 0)).ToList();
                 Assert.That(entities.Count, Is.EqualTo(2));

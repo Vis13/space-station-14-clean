@@ -1,7 +1,5 @@
-﻿#nullable enable
-using Content.Server.GameObjects.Components.Botany;
-using JetBrains.Annotations;
-using Robust.Shared.Interfaces.GameObjects;
+﻿using JetBrains.Annotations;
+using Robust.Shared.GameObjects;
 
 namespace Content.Server.Chemistry.PlantMetabolism
 {

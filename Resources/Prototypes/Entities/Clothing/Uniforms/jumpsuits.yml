@@ -1,5 +1,16 @@
 - type: entity
   parent: ClothingUniformBase
+  id: ClothingUniformJumpsuitAncient
+  name: ancient jumpsuit
+  description: A terribly ragged and frayed grey jumpsuit. It looks like it hasn't been washed in over a decade.
+  components:
+  - type: Sprite
+    sprite: Clothing/Uniforms/Jumpsuit/ancient.rsi
+  - type: Clothing
+    sprite: Clothing/Uniforms/Jumpsuit/ancient.rsi
+
+- type: entity
+  parent: ClothingUniformBase
   id: ClothingUniformJumpsuitBartender
   name: bartender's uniform
   description: A nice and tidy uniform. Shame about the bar though.
@@ -54,16 +65,6 @@
     sprite: Clothing/Uniforms/Jumpsuit/ce.rsi
 
 - type: entity
-  parent: ClothingUniformJumpsuitChiefEngineer
-  id: S
-  name: s
-  components:
-  - type: Sprite
-    state: s
-  - type: Clothing
-    HeldPrefix: s
-
-- type: entity
   parent: ClothingUniformBase
   id: ClothingUniformJumpsuitChaplain
   name: chaplain's jumpsuit
@@ -73,6 +74,28 @@
       sprite: Clothing/Uniforms/Jumpsuit/chaplain.rsi
     - type: Clothing
       sprite: Clothing/Uniforms/Jumpsuit/chaplain.rsi
+
+- type: entity
+  parent: ClothingUniformBase
+  id: ClothingUniformJumpsuitCentcomOfficial
+  name: centcom official's jumpsuit
+  description: It's a jumpsuit worn by CentCom's officials.
+  components:
+  - type: Sprite
+    sprite: Clothing/Uniforms/Jumpsuit/centcom_official.rsi
+  - type: Clothing
+    sprite: Clothing/Uniforms/Jumpsuit/centcom_official.rsi
+
+- type: entity
+  parent: ClothingUniformBase
+  id: ClothingUniformJumpsuitCentcomOfficer
+  name: centcom officer's jumpsuit
+  description: It's a jumpsuit worn by CentCom Officers.
+  components:
+  - type: Sprite
+    sprite: Clothing/Uniforms/Jumpsuit/centcom_officer.rsi
+  - type: Clothing
+    sprite: Clothing/Uniforms/Jumpsuit/centcom_officer.rsi
 
 - type: entity
   parent: ClothingUniformBase
@@ -548,3 +571,14 @@
     sprite: Clothing/Uniforms/Jumpsuit/rainbow.rsi
   - type: Clothing
     sprite: Clothing/Uniforms/Jumpsuit/rainbow.rsi
+
+- type: entity
+  parent: ClothingUniformBase
+  id: ClothingUniformOveralls
+  name: overalls
+  description: Great for working outdoors.
+  components:
+  - type: Sprite
+    sprite: Clothing/Uniforms/Jumpsuit/overalls.rsi
+  - type: Clothing
+    sprite: Clothing/Uniforms/Jumpsuit/overalls.rsi

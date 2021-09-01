@@ -8,22 +8,25 @@
   - type: Clickable
   - type: Sprite
     netsync: false
-    directional: false
+    noRot: false
     sprite: Objects/Weapons/Guns/Projectiles/bullet.rsi
     state: bullet
   - type: Physics
-    anchored: false
-    edgeslide: false
-    hard: false
-    shapes:
-    - !type:PhysShapeAabb
-      bounds: "-0.1,-0.1,0.1,0.1"
-      layer: [Clickable]
+    bodyType: Dynamic
+    fixtures:
+    - shape:
+        !type:PhysShapeAabb
+          bounds: "-0.1,-0.1,0.1,0.1"
+      hard: false
       mask:
       - Impassable
+      layer:
       - MobImpassable
+    linearDamping: 0
+    angularDamping: 0
   - type: Projectile
-    soundHit: /Audio/Weapons/Guns/Hits/bullet_hit.ogg
+    soundHit:
+      path: /Audio/Weapons/Guns/Hits/bullet_hit.ogg
     damages:
       Piercing: 20
 
@@ -34,11 +37,17 @@
   abstract: true
   components:
   - type: Projectile
-    soundHit: /Audio/Weapons/Guns/Hits/snap.ogg
+    soundHit:
+      path: /Audio/Weapons/Guns/Hits/snap.ogg
     damages:
       Piercing: 10
-  - type: FlashProjectile
+  - type: FlashOnTrigger
     range: 1
+  - type: SoundOnTrigger
+    sound:
+      path: "/Audio/Effects/flash_bang.ogg"
+  - type: TriggerOnCollide
+  - type: DeleteOnTrigger
 
 - type: entity
   id: BulletBaseHV
@@ -67,28 +76,21 @@
   abstract: true
   components:
   - type: Projectile
-    soundHit: /Audio/Weapons/Guns/Hits/snap.ogg
+    soundHit:
+      path: /Audio/Weapons/Guns/Hits/snap.ogg
     damages:
       Blunt: 3
-  - type: StunnableProjectile
-    paralyzeAmount: 2
+  - type: StunOnCollide
+    stunAmount: 2
+    knockdownAmount: 2
 
+# Energy projectiles
 - type: entity
-  name : taser
+  name : taser bolt
   id: BulletTaser
+  parent: BulletBase
   abstract: true
   components:
-  - type: Ammo
-    isProjectile: true
-    ammoVelocity: 20
-    caliber: Energy
-  - type: Projectile
-    soundHitSpecies: "/Audio/Weapons/Guns/Hits/taser_hit.ogg"
-    damages:
-      Heat: 5
-  - type: StunnableProjectile
-    stunAmount: 5
-    knockdownAmount: 5
   - type: Sprite
     directional: false
     sprite: Objects/Weapons/Guns/Projectiles/spark.rsi
@@ -97,14 +99,57 @@
     - state: spark
       shader: unshaded
   - type: Physics
-    anchored: false
-    edgeslide: false
-    hard: false
-    shapes:
-    - !type:PhysShapeAabb
-      bounds: "-0.2,-0.2,0.2,0.2"
-      layer: 32
-      mask: 30
+    fixtures:
+    - shape:
+        !type:PhysShapeAabb
+          bounds: "-0.2,-0.2,0.2,0.2"
+      hard: false
+      mask:
+      - Impassable
+      layer:
+      - MobImpassable
+  - type: Ammo
+    isProjectile: true
+    ammoVelocity: 20
+    caliber: Energy
+  - type: Projectile
+    soundHit:
+      path: "/Audio/Weapons/Guns/Hits/taser_hit.ogg"
+    damages:
+      Heat: 5
+  - type: StunOnCollide
+    stunAmount: 5
+    knockdownAmount: 5
+
+- type: entity
+  name: emitter bolt
+  id: EmitterBolt
+  parent: BulletBase
+  abstract: true
+  components:
+  - type: Sprite
+    color: "#ffff33"
+    sprite: Structures/Power/Generation/Singularity/emitter.rsi
+    state: 'projectile'
+  - type: Physics
+    fixtures:
+    - shape:
+        !type:PhysShapeAabb
+          bounds: "-0.2,-0.2,0.2,0.2"
+      hard: false
+      layer:
+        - Impassable
+        - MobImpassable
+      mask:
+        - Opaque
+  - type: Projectile
+    soundHit:
+      path: /Audio/Weapons/Guns/Hits/bullet_hit.ogg
+    damages:
+      Heat: 20
+  - type: Tag
+    tags:
+    - EmitterBolt
 
 # Launcher projectiles (grenade / rocket)
 - type: entity
@@ -117,7 +162,9 @@
     netsync: false
     sprite: Objects/Weapons/Guns/Projectiles/rocket.rsi
     state: frag
-  - type: ExplosiveProjectile
+  - type: ExplodeOnTrigger
+  - type: DeleteOnTrigger
+  - type: TriggerOnCollide
   - type: Projectile
     deleteOnCollide: false
   - type: Explosive
@@ -142,9 +189,11 @@
     state: grenade
   - type: Projectile
     deleteOnCollide: false
-    soundHit: /Audio/Effects/gen_hit.ogg
-  - type: StunnableProjectile
-    paralyzeAmount: 8
+    soundHit:
+      path: /Audio/Effects/gen_hit.ogg
+  - type: StunOnCollide
+    stunAmount: 8
+    knockdownAmount: 8
 
 - type: entity
   id: BulletGrenadeBlast
@@ -156,7 +205,9 @@
     netsync: false
     sprite: Objects/Weapons/Guns/Projectiles/grenade.rsi
     state: grenade
-  - type: ExplosiveProjectile
+  - type: ExplodeOnTrigger
+  - type: DeleteOnTrigger
+  - type: TriggerOnCollide
   - type: Projectile
     deleteOnCollide: false
   - type: Explosive
@@ -177,9 +228,15 @@
     state: grenade
   - type: Projectile
     deleteOnCollide: false
-    soundHit: /Audio/Effects/flash_bang.ogg
-  - type: FlashProjectile
+    soundHit:
+      path: /Audio/Effects/flash_bang.ogg
+  - type: FlashOnTrigger
     range: 7
+  - type: SoundOnTrigger
+    sound:
+      path: "/Audio/Effects/flash_bang.ogg"
+  - type: TriggerOnCollide
+  - type: DeleteOnTrigger
 
 # This is supposed to spawn shrapnel and stuff so uhh... TODO?
 - type: entity
@@ -192,7 +249,9 @@
     netsync: false
     sprite: Objects/Weapons/Guns/Projectiles/grenade.rsi
     state: grenade
-  - type: ExplosiveProjectile
+  - type: ExplodeOnTrigger
+  - type: DeleteOnTrigger
+  - type: TriggerOnCollide
   - type: Projectile
     deleteOnCollide: false
   - type: Explosive
@@ -213,7 +272,8 @@
     state: foamdart
   - type: Projectile
     deleteOnCollide: true
-    soundHit: /Audio/Guns/Hits/snap.ogg
+    soundHit:
+      path: /Audio/Weapons/Guns/Hits/snap.ogg
     damages:
       Blunt: 2
 
@@ -229,3 +289,28 @@
     state: capbullet
   - type: Projectile
     deleteOnCollide: true
+    damages:
+      Piercing: 0
+
+- type: entity
+  id: BulletCreampie
+  name: cream pie
+  parent: BulletBase
+  description: get creampied, honk!!
+  abstract: true
+  components:
+  - type: Projectile
+    deleteOnCollide: false # CreamPie component handles this.
+  - type: CreamPie
+  - type: ThrownItem
+  - type: Sprite
+    sprite: Objects/Consumable/Food/Baked/pie.rsi
+    netsync: false
+    layers:
+    - state: tin
+    - state: plain
+  - type: SolutionContainer
+    contents:
+      reagents:
+      - ReagentId: Nutriment
+        Quantity: 8

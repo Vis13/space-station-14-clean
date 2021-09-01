@@ -1,19 +1,16 @@
-﻿#nullable enable
-using System.Threading.Tasks;
-using Content.Server.GameObjects.Components.Construction;
+﻿using System.Threading.Tasks;
+using Content.Server.Construction.Components;
 using Content.Shared.Construction;
 using JetBrains.Annotations;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Serialization;
+using Robust.Shared.GameObjects;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.Construction.Completions
 {
     [UsedImplicitly]
+    [DataDefinition]
     public class MachineFrameRegenerateProgress : IGraphAction
     {
-        public void ExposeData(ObjectSerializer serializer)
-        { }
-
         public async Task PerformAction(IEntity entity, IEntity? user)
         {
             if (entity.Deleted)

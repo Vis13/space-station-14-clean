@@ -7,8 +7,8 @@ using Content.Server.AI.Utility.Considerations.Clothing;
 using Content.Server.AI.WorldState;
 using Content.Server.AI.WorldState.States;
 using Content.Server.AI.WorldState.States.Clothing;
-using Content.Server.GameObjects.Components.Items.Clothing;
-using Content.Shared.GameObjects.Components.Inventory;
+using Content.Server.Clothing.Components;
+using Content.Shared.Inventory;
 using Robust.Shared.IoC;
 
 namespace Content.Server.AI.Utility.ExpandableActions.Clothing.Gloves
@@ -35,10 +35,10 @@ namespace Content.Server.AI.Utility.ExpandableActions.Clothing.Gloves
 
             foreach (var entity in context.GetState<NearbyClothingState>().GetValue())
             {
-                if (entity.TryGetComponent(out ClothingComponent clothing) &&
+                if (entity.TryGetComponent(out ClothingComponent? clothing) &&
                     (clothing.SlotFlags & EquipmentSlotDefines.SlotFlags.GLOVES) != 0)
                 {
-                    yield return new PickUpGloves(owner, entity, Bonus);
+                    yield return new PickUpGloves {Owner = owner, Target = entity, Bonus = Bonus};
                 }
             }
         }

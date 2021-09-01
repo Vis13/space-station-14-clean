@@ -1,6 +1,6 @@
 using Content.Server.AI.WorldState;
 using Content.Server.AI.WorldState.States;
-using Content.Server.GameObjects.Components.Chemistry;
+using Content.Server.Chemistry.Components;
 
 namespace Content.Server.AI.Utility.Considerations.Nutrition.Food
 {
@@ -10,7 +10,7 @@ namespace Content.Server.AI.Utility.Considerations.Nutrition.Food
         {
             var target = context.GetState<TargetEntityState>().GetValue();
 
-            if (target.Deleted || !target.TryGetComponent(out SolutionContainerComponent food))
+            if (target == null || target.Deleted || !target.TryGetComponent(out SolutionContainerComponent? food))
             {
                 return 0.0f;
             }

@@ -1,0 +1,14 @@
+﻿- type: stack
+  id: Cable
+  name: lv cable
+  icon: "/Textures/Objects/Tools/cable-coils.rsi/coil-30.png"
+  spawn: CableApcStack1
+
+- type: stack
+  id: CableMV
+  name: mv cable
+  spawn: CableHVStack1
+
+- type: stack
+  id: CableHV
+  name: hv cable

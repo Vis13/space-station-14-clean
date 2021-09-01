@@ -1,20 +1,16 @@
-﻿#nullable enable
-using System;
-using Content.Server.Mobs;
-using Robust.Shared.Interfaces.Serialization;
-using Robust.Shared.Serialization;
+﻿using System;
 using Robust.Shared.Utility;
 
 namespace Content.Server.Objectives.Interfaces
 {
-    public interface IObjectiveCondition : IExposeData, IEquatable<IObjectiveCondition>
+    public interface IObjectiveCondition : IEquatable<IObjectiveCondition>
     {
         /// <summary>
         /// Returns a copy of the IObjectiveCondition which is assigned to the mind.
         /// </summary>
         /// <param name="mind">Mind to assign to.</param>
         /// <returns>The new IObjectiveCondition.</returns>
-        IObjectiveCondition GetAssigned(Mind mind);
+        IObjectiveCondition GetAssigned(Mind.Mind mind);
 
         /// <summary>
         /// Returns the title of the condition.
@@ -41,7 +37,5 @@ namespace Content.Server.Objectives.Interfaces
         /// Returns a difficulty of the condition.
         /// </summary>
         float Difficulty { get; }
-
-        void IExposeData.ExposeData(ObjectSerializer serializer){}
     }
 }

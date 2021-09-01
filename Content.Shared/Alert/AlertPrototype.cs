@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Globalization;
 using Robust.Shared.Log;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Utility;
 using Robust.Shared.ViewVariables;
-using YamlDotNet.RepresentationModel;
 
 namespace Content.Shared.Alert
 {
@@ -12,11 +14,15 @@ namespace Content.Shared.Alert
     /// An alert popup with associated icon, tooltip, and other data.
     /// </summary>
     [Prototype("alert")]
-    public class AlertPrototype : IPrototype
+    public class AlertPrototype : IPrototype, ISerializationHooks
     {
+        [ViewVariables]
+        string IPrototype.ID => AlertType.ToString();
+
         /// <summary>
         /// Type of alert, no 2 alert prototypes should have the same one.
         /// </summary>
+        [DataField("alertType")]
         public AlertType AlertType { get; private set; }
 
         /// <summary>
@@ -26,17 +32,20 @@ namespace Content.Shared.Alert
         /// to get the correct icon path for a particular severity level.
         /// </summary>
         [ViewVariables]
-        public string IconPath { get; private set; }
+        [DataField("icon")]
+        public SpriteSpecifier Icon { get; private set; } = SpriteSpecifier.Invalid;
 
         /// <summary>
         /// Name to show in tooltip window. Accepts formatting.
         /// </summary>
-        public FormattedMessage Name { get; private set; }
+        [DataField("name")]
+        public FormattedMessage Name { get; private set; } = new();
 
         /// <summary>
         /// Description to show in tooltip window. Accepts formatting.
         /// </summary>
-        public FormattedMessage Description { get; private set; }
+        [DataField("description")]
+        public FormattedMessage Description { get; private set; } = new();
 
         /// <summary>
         /// Category the alert belongs to. Only one alert of a given category
@@ -45,6 +54,7 @@ namespace Content.Shared.Alert
         /// replace each other and are mutually exclusive, for example lowpressure / highpressure,
         /// hot / cold. If left unspecified, the alert will not replace or be replaced by any other alerts.
         /// </summary>
+        [DataField("category")]
         public AlertCategory? Category { get; private set; }
 
         /// <summary>
@@ -57,81 +67,79 @@ namespace Content.Shared.Alert
         /// -1 (no effect) unless MaxSeverity is specified. Defaults to 1. Minimum severity level supported by this state.
         /// </summary>
         public short MinSeverity => MaxSeverity == -1 ? (short) -1 : _minSeverity;
-        private short _minSeverity;
+
+        [DataField("minSeverity")] private short _minSeverity = 1;
 
         /// <summary>
         /// Maximum severity level supported by this state. -1 (default) indicates
         /// no severity levels are supported by the state.
         /// </summary>
-        public short MaxSeverity { get; private set; }
+        [DataField("maxSeverity")]
+        public short MaxSeverity = -1;
 
         /// <summary>
         /// Indicates whether this state support severity levels
         /// </summary>
         public bool SupportsSeverity => MaxSeverity != -1;
 
-        public void LoadFrom(YamlMappingNode mapping)
+        /// <summary>
+        /// Defines what to do when the alert is clicked.
+        /// This will always be null on clientside.
+        /// </summary>
+        [DataField("onClick", serverOnly: true)]
+        public IAlertClick? OnClick { get; private set; }
+
+        void ISerializationHooks.AfterDeserialization()
         {
-            var serializer = YamlObjectSerializer.NewReader(mapping);
-
-            serializer.DataField(this, x => x.IconPath, "icon", string.Empty);
-            serializer.DataField(this, x => x.MaxSeverity, "maxSeverity", (short) -1);
-            serializer.DataField(ref _minSeverity, "minSeverity", (short) 1);
-
-            serializer.DataReadFunction("name", string.Empty,
-                s => Name = FormattedMessage.FromMarkup(s));
-            serializer.DataReadFunction("description", string.Empty,
-                s => Description = FormattedMessage.FromMarkup(s));
-
-            serializer.DataField(this, x => x.AlertType, "alertType", AlertType.Error);
             if (AlertType == AlertType.Error)
             {
                 Logger.ErrorS("alert", "missing or invalid alertType for alert with name {0}", Name);
             }
 
-            if (serializer.TryReadDataField("category", out AlertCategory alertCategory))
-            {
-                Category = alertCategory;
-            }
             AlertKey = new AlertKey(AlertType, Category);
         }
 
         /// <param name="severity">severity level, if supported by this alert</param>
         /// <returns>the icon path to the texture for the provided severity level</returns>
-        public string GetIconPath(short? severity = null)
+        public SpriteSpecifier GetIcon(short? severity = null)
         {
             if (!SupportsSeverity && severity != null)
             {
-                Logger.WarningS("alert", "attempted to get icon path for severity level for alert {0}, but" +
-                                          " this alert does not support severity levels", AlertType);
+                throw new InvalidOperationException($"This alert ({AlertKey}) does not support severity");
             }
-            if (!SupportsSeverity) return IconPath;
+
+            if (!SupportsSeverity)
+                return Icon;
+
             if (severity == null)
             {
-                Logger.WarningS("alert", "attempted to get icon path without severity level for alert {0}," +
-                                " but this alert requires a severity level. Using lowest" +
-                                " valid severity level instead...", AlertType);
-                severity = MinSeverity;
+                throw new ArgumentException($"No severity specified but this alert ({AlertKey}) has severity.", nameof(severity));
             }
 
             if (severity < MinSeverity)
             {
-                Logger.WarningS("alert", "attempted to get icon path with severity level {0} for alert {1}," +
-                                          " but the minimum severity level for this alert is {2}. Using" +
-                                          " lowest valid severity level instead...", severity, AlertType, MinSeverity);
-                severity = MinSeverity;
-            }
-            if (severity > MaxSeverity)
-            {
-                Logger.WarningS("alert", "attempted to get icon path with severity level {0} for alert {1}," +
-                                          " but the max severity level for this alert is {2}. Using" +
-                                          " highest valid severity level instead...", severity, AlertType, MaxSeverity);
-                severity = MaxSeverity;
+                throw new ArgumentOutOfRangeException(nameof(severity), $"Severity below minimum severity in {AlertKey}.");
             }
 
-            // split and add the severity number to the path
-            var ext = IconPath.LastIndexOf('.');
-            return IconPath.Substring(0, ext) + severity + IconPath.Substring(ext, IconPath.Length - ext);
+            if (severity > MaxSeverity)
+            {
+                throw new ArgumentOutOfRangeException(nameof(severity), $"Severity above maximum severity in {AlertKey}.");
+            }
+
+            var severityText = severity.Value.ToString(CultureInfo.InvariantCulture);
+            switch (Icon)
+            {
+                case SpriteSpecifier.EntityPrototype entityPrototype:
+                    throw new InvalidOperationException($"Severity not supported for EntityPrototype icon in {AlertKey}");
+                case SpriteSpecifier.Rsi rsi:
+                    return new SpriteSpecifier.Rsi(rsi.RsiPath, rsi.RsiState + severityText);
+                case SpriteSpecifier.Texture texture:
+                    var newName = texture.TexturePath.FilenameWithoutExtension + severityText;
+                    return new SpriteSpecifier.Texture(
+                        texture.TexturePath.WithName(newName + "." + texture.TexturePath.Extension));
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(Icon));
+            }
         }
     }
 
@@ -141,46 +149,51 @@ namespace Content.Shared.Alert
     /// falls back to the id.
     /// </summary>
     [Serializable, NetSerializable]
-    public struct AlertKey
+    public struct AlertKey : ISerializationHooks, IPopulateDefaultValues
     {
-        private readonly AlertType? _alertType;
-        private readonly AlertCategory? _alertCategory;
+        public AlertType? AlertType { get; private set; }
+        public readonly AlertCategory? AlertCategory;
 
         /// NOTE: if the alert has a category you must pass the category for this to work
-        /// properly as a key. I.e. if the alert has a category and you pass only the ID, and you
-        /// compare this to another AlertKey that has both the category and the same ID, it will not consider them equal.
+        /// properly as a key. I.e. if the alert has a category and you pass only the alert type, and you
+        /// compare this to another AlertKey that has both the category and the same alert type, it will not consider them equal.
         public AlertKey(AlertType? alertType, AlertCategory? alertCategory)
         {
-            // if there is a category, ignore the alerttype.
-            if (alertCategory != null)
-            {
-                _alertCategory = alertCategory;
-                _alertType = null;
-            }
-            else
-            {
-                _alertCategory = null;
-                _alertType = alertType;
-            }
+            AlertCategory = alertCategory;
+            AlertType = alertType;
         }
 
         public bool Equals(AlertKey other)
         {
-            return _alertType == other._alertType && _alertCategory == other._alertCategory;
+            // compare only on alert category if we have one
+            if (AlertCategory.HasValue)
+            {
+                return other.AlertCategory == AlertCategory;
+            }
+
+            return AlertType == other.AlertType && AlertCategory == other.AlertCategory;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is AlertKey other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(_alertType, _alertCategory);
+            // use only alert category if we have one
+            if (AlertCategory.HasValue) return AlertCategory.GetHashCode();
+            return AlertType.GetHashCode();
+        }
+
+        public void PopulateDefaultValues()
+        {
+            AlertType = Alert.AlertType.Error;
         }
 
         /// <param name="category">alert category, must not be null</param>
-        /// <returns>An alert key for the provided alert category</returns>
+        /// <returns>An alert key for the provided alert category. This must only be used for
+        /// queries and never storage, as it is lacking an alert type.</returns>
         public static AlertKey ForCategory(AlertCategory category)
         {
             return new(null, category);

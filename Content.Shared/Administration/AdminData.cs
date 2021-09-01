@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Content.Shared.Administration
 {
     /// <summary>
@@ -63,6 +62,11 @@ namespace Content.Shared.Administration
         public bool CanAdminMenu()
         {
             return HasFlag(AdminFlags.Admin);
+        }
+
+        public bool CanAdminReloadPrototypes()
+        {
+            return HasFlag(AdminFlags.Host);
         }
     }
 }

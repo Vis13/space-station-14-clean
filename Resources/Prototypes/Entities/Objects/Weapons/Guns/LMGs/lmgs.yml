@@ -11,7 +11,6 @@
     state: icon
   - type: Item
     size: 24
-    state: icon
   - type: MagazineBarrel
     currentSelector: Automatic
     allSelectors:
@@ -25,20 +24,28 @@
     angleIncrease: 10
     angleDecay: 60
     magNeedsOpenBolt: true
-    soundGunshot: /Audio/Weapons/Guns/Gunshots/lmg.ogg
-    soundEmpty: /Audio/Weapons/Guns/Empty/lmg_empty.ogg
-    soundRack: /Audio/Weapons/Guns/Cock/lmg_cock.ogg
-    soundBoltOpen: /Audio/Weapons/Guns/Bolt/rifle_bolt_open.ogg
-    soundBoltClosed: /Audio/Weapons/Guns/Bolt/rifle_bolt_closed.ogg
-    soundAutoEject: /Audio/Weapons/Guns/EmptyAlarm/lmg_empty_alarm.ogg
-    soundMagInsert: /Audio/Weapons/Guns/MagIn/lmg_magin.ogg
-    soundMagEject: /Audio/Weapons/Guns/MagOut/lmg_magout.ogg
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/lmg.ogg
+    soundEmpty:
+      path: /Audio/Weapons/Guns/Empty/lmg_empty.ogg
+    soundRack:
+      path: /Audio/Weapons/Guns/Cock/lmg_cock.ogg
+    soundBoltOpen:
+      path: /Audio/Weapons/Guns/Bolt/rifle_bolt_open.ogg
+    soundBoltClosed:
+      path: /Audio/Weapons/Guns/Bolt/rifle_bolt_closed.ogg
+    soundAutoEject:
+      path: /Audio/Weapons/Guns/EmptyAlarm/lmg_empty_alarm.ogg
+    soundMagInsert:
+      path: /Audio/Weapons/Guns/MagIn/lmg_magin.ogg
+    soundMagEject:
+      path: /Audio/Weapons/Guns/MagOut/lmg_magout.ogg
 
 - type: entity
   name: L6 SAW
   id: LMGL6
   parent: LMGBase
-  description: A rather traditionally made L6 SAW with a pleasantly lacquered wooden pistol grip. This one is unmarked.
+  description: A rather traditionally made LMG with a pleasantly lacquered wooden pistol grip.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/LMGs/l6.rsi
@@ -74,7 +81,7 @@
   name: pulemyot kalashnikova
   id: LMGPK
   parent: LMGBase
-  description: Kalashnikov's Machinegun, a well preserved and maintained antique weapon of war.
+  description: A well preserved and maintained antique weapon of war.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/LMGs/pk.rsi

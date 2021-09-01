@@ -1,15 +1,11 @@
-﻿using Content.Server.Mobs;
-using Robust.Shared.Interfaces.Serialization;
-
-namespace Content.Server.Objectives.Interfaces
+﻿namespace Content.Server.Objectives.Interfaces
 {
-    public interface IObjectiveRequirement : IExposeData
+    public interface IObjectiveRequirement
     {
-
         /// <summary>
         /// Checks whether or not the entity & its surroundings are valid to be given the objective.
         /// </summary>
         /// <returns>Returns true if objective can be given.</returns>
-        bool CanBeAssigned(Mind mind);
+        bool CanBeAssigned(Mind.Mind mind);
     }
 }

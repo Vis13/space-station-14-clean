@@ -1,7 +1,7 @@
-using Content.Server.GameObjects.Components.Mobs;
-using Content.Server.GameObjects.Components.Weapon.Melee;
-using Content.Server.GameObjects.EntitySystems.Click;
-using Robust.Shared.Interfaces.GameObjects;
+using Content.Server.CombatMode;
+using Content.Server.Interaction;
+using Content.Server.Weapon.Melee.Components;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 
 namespace Content.Server.AI.Operators.Combat.Melee
@@ -13,7 +13,7 @@ namespace Content.Server.AI.Operators.Combat.Melee
 
         private readonly IEntity _owner;
         private readonly IEntity _target;
-        private UnarmedCombatComponent _unarmedCombat;
+        private UnarmedCombatComponent? _unarmedCombat;
 
         public UnarmedCombatOperator(IEntity owner, IEntity target, float burstTime = 1.0f)
         {
@@ -22,14 +22,14 @@ namespace Content.Server.AI.Operators.Combat.Melee
             _burstTime = burstTime;
         }
 
-        public override bool TryStartup()
+        public override bool Startup()
         {
-            if (!base.TryStartup())
+            if (!base.Startup())
             {
                 return true;
             }
 
-            if (!_owner.TryGetComponent(out CombatModeComponent combatModeComponent))
+            if (!_owner.TryGetComponent(out CombatModeComponent? combatModeComponent))
             {
                 return false;
             }
@@ -39,7 +39,7 @@ namespace Content.Server.AI.Operators.Combat.Melee
                 combatModeComponent.IsInCombatMode = true;
             }
 
-            if (_owner.TryGetComponent(out UnarmedCombatComponent unarmedCombatComponent))
+            if (_owner.TryGetComponent(out UnarmedCombatComponent? unarmedCombatComponent))
             {
                 _unarmedCombat = unarmedCombatComponent;
             }
@@ -51,13 +51,17 @@ namespace Content.Server.AI.Operators.Combat.Melee
             return true;
         }
 
-        public override void Shutdown(Outcome outcome)
+        public override bool Shutdown(Outcome outcome)
         {
-            base.Shutdown(outcome);
-            if (_owner.TryGetComponent(out CombatModeComponent combatModeComponent))
+            if (!base.Shutdown(outcome))
+                return false;
+
+            if (_owner.TryGetComponent(out CombatModeComponent? combatModeComponent))
             {
                 combatModeComponent.IsInCombatMode = false;
             }
+
+            return true;
         }
 
         public override Outcome Execute(float frameTime)
@@ -67,7 +71,7 @@ namespace Content.Server.AI.Operators.Combat.Melee
                 return Outcome.Success;
             }
 
-            if (_unarmedCombat.Deleted)
+            if (_unarmedCombat?.Deleted ?? true)
             {
                 return Outcome.Failed;
             }
@@ -79,7 +83,7 @@ namespace Content.Server.AI.Operators.Combat.Melee
             }
 
             var interactionSystem = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<InteractionSystem>();
-            interactionSystem.UseItemInHand(_owner, _target.Transform.Coordinates, _target.Uid);
+            interactionSystem.AiUseInteraction(_owner, _target.Transform.Coordinates, _target.Uid);
             _elapsedTime += frameTime;
             return Outcome.Continuing;
         }

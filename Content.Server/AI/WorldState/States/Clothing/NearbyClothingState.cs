@@ -1,11 +1,11 @@
 using System.Collections.Generic;
+using Content.Server.AI.Components;
 using Content.Server.AI.Utils;
-using Content.Server.GameObjects.Components.Items.Clothing;
-using Content.Server.GameObjects.Components.Items.Storage;
-using Content.Server.GameObjects.Components.Movement;
+using Content.Server.Clothing.Components;
+using Content.Server.Storage.Components;
 using JetBrains.Annotations;
 using Robust.Shared.Containers;
-using Robust.Shared.Interfaces.GameObjects;
+using Robust.Shared.GameObjects;
 
 namespace Content.Server.AI.WorldState.States.Clothing
 {
@@ -18,7 +18,7 @@ namespace Content.Server.AI.WorldState.States.Clothing
         {
             var result = new List<IEntity>();
 
-            if (!Owner.TryGetComponent(out AiControllerComponent controller))
+            if (!Owner.TryGetComponent(out AiControllerComponent? controller))
             {
                 return result;
             }

@@ -6,13 +6,12 @@
   head: true
   positions: 1
   startingGear: CMOGear
-  department:
+  departments:
   - Command
   - Medical
   icon: "ChiefMedicalOfficer"
   access:
   - Medical
-  - ChiefMedicalOfficer
   - Command
   - Maintenance
 
@@ -26,3 +25,6 @@
     idcard: CMOPDA
     ears: ClothingHeadsetAltMedical
     belt: ClothingBeltMedical
+  innerclothingskirt: ClothingUniformJumpskirtCMO
+  satchel: ClothingBackpackSatchelMedicalFilled
+  duffelbag: ClothingBackpackDuffelMedicalFilled

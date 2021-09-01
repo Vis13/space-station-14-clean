@@ -1,11 +1,10 @@
-﻿#nullable enable
-using Content.Server.AI.Utility;
+﻿using Content.Server.AI.Utility;
 using Content.Server.AI.WorldState.States.Inventory;
-using Content.Server.GameObjects.Components.Items.Storage;
-using Content.Shared.Interfaces.GameObjects.Components;
-using Content.Shared.Utility;
+using Content.Server.Storage.Components;
+using Content.Shared.Interaction;
+using Content.Shared.Interaction.Helpers;
 using Robust.Shared.Containers;
-using Robust.Shared.Interfaces.GameObjects;
+using Robust.Shared.GameObjects;
 
 namespace Content.Server.AI.Operators.Inventory
 {
@@ -43,7 +42,7 @@ namespace Content.Server.AI.Operators.Inventory
 
             if (!storageComponent.Open)
             {
-                var activateArgs = new ActivateEventArgs {User = _owner, Target = _target};
+                var activateArgs = new ActivateEventArgs(_owner, _target);
                 storageComponent.Activate(activateArgs);
             }
 

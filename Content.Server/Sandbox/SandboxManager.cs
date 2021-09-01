@@ -1,37 +1,34 @@
 using System.Linq;
-using Content.Server.GameObjects.Components.Access;
-using Content.Server.GameObjects.Components.GUI;
-using Content.Server.GameObjects.Components.Items.Storage;
-using Content.Server.GameObjects.Components.PDA;
+using Content.Server.Access.Components;
 using Content.Server.GameTicking;
-using Content.Server.Interfaces.GameTicking;
+using Content.Server.Hands.Components;
+using Content.Server.Inventory.Components;
+using Content.Server.Items;
+using Content.Server.PDA;
 using Content.Shared.Access;
 using Content.Shared.Sandbox;
 using Robust.Server.Console;
 using Robust.Server.GameObjects;
-using Robust.Server.Interfaces.Console;
-using Robust.Server.Interfaces.Placement;
-using Robust.Server.Interfaces.Player;
+using Robust.Server.Placement;
 using Robust.Server.Player;
 using Robust.Shared.Enums;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Network;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
+using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.ViewVariables;
-using static Content.Shared.GameObjects.Components.Inventory.EquipmentSlotDefines;
+using static Content.Shared.Inventory.EquipmentSlotDefines;
 
 namespace Content.Server.Sandbox
 {
-    internal sealed class SandboxManager : SharedSandboxManager, ISandboxManager
+    internal sealed class SandboxManager : SharedSandboxManager, ISandboxManager, IEntityEventSubscriber
     {
         [Dependency] private readonly IPlayerManager _playerManager = default!;
         [Dependency] private readonly IServerNetManager _netManager = default!;
-        [Dependency] private readonly IGameTicker _gameTicker = default!;
         [Dependency] private readonly IPlacementManager _placementManager = default!;
         [Dependency] private readonly IConGroupController _conGroupController = default!;
         [Dependency] private readonly IEntityManager _entityManager = default!;
-        [Dependency] private readonly IConsoleShell _shell = default!;
+        [Dependency] private readonly IServerConsoleHost _host = default!;
 
         private bool _isSandboxEnabled;
 
@@ -48,14 +45,14 @@ namespace Content.Server.Sandbox
 
         public void Initialize()
         {
-            _netManager.RegisterNetMessage<MsgSandboxStatus>(nameof(MsgSandboxStatus));
-            _netManager.RegisterNetMessage<MsgSandboxRespawn>(nameof(MsgSandboxRespawn), SandboxRespawnReceived);
-            _netManager.RegisterNetMessage<MsgSandboxGiveAccess>(nameof(MsgSandboxGiveAccess), SandboxGiveAccessReceived);
-            _netManager.RegisterNetMessage<MsgSandboxGiveAghost>(nameof(MsgSandboxGiveAghost), SandboxGiveAghostReceived);
-            _netManager.RegisterNetMessage<MsgSandboxSuicide>(nameof(MsgSandboxSuicide), SandboxSuicideReceived);
+            _netManager.RegisterNetMessage<MsgSandboxStatus>();
+            _netManager.RegisterNetMessage<MsgSandboxRespawn>(SandboxRespawnReceived);
+            _netManager.RegisterNetMessage<MsgSandboxGiveAccess>(SandboxGiveAccessReceived);
+            _netManager.RegisterNetMessage<MsgSandboxGiveAghost>(SandboxGiveAghostReceived);
+            _netManager.RegisterNetMessage<MsgSandboxSuicide>(SandboxSuicideReceived);
 
             _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
-            _gameTicker.OnRunLevelChanged += GameTickerOnOnRunLevelChanged;
+            _entityManager.EventBus.SubscribeEvent<GameRunLevelChangedEvent>(EventSource.Local, this, GameTickerOnOnRunLevelChanged);
 
             _placementManager.AllowPlacementFunc = placement =>
             {
@@ -76,16 +73,16 @@ namespace Content.Server.Sandbox
             };
         }
 
-        private void GameTickerOnOnRunLevelChanged(GameRunLevelChangedEventArgs obj)
+        private void GameTickerOnOnRunLevelChanged(GameRunLevelChangedEvent obj)
         {
             // Automatically clear sandbox state when round resets.
-            if (obj.NewRunLevel == GameRunLevel.PreRoundLobby)
+            if (obj.New == GameRunLevel.PreRoundLobby)
             {
                 IsSandboxEnabled = false;
             }
         }
 
-        private void OnPlayerStatusChanged(object sender, SessionStatusEventArgs e)
+        private void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs e)
         {
             if (e.NewStatus != SessionStatus.Connected || e.OldStatus != SessionStatus.Connecting)
             {
@@ -105,7 +102,7 @@ namespace Content.Server.Sandbox
             }
 
             var player = _playerManager.GetSessionByChannel(message.MsgChannel);
-            _gameTicker.Respawn(player);
+            EntitySystem.Get<GameTicker>().Respawn(player);
         }
 
         private void SandboxGiveAccessReceived(MsgSandboxGiveAccess message)
@@ -125,14 +122,14 @@ namespace Content.Server.Sandbox
                 .EnumeratePrototypes<AccessLevelPrototype>()
                 .Select(p => p.ID).ToArray();
 
-            if (player.AttachedEntity.TryGetComponent(out InventoryComponent inv)
-                && inv.TryGetSlotItem(Slots.IDCARD, out ItemComponent wornItem))
+            if (player.AttachedEntity.TryGetComponent(out InventoryComponent? inv)
+                && inv.TryGetSlotItem(Slots.IDCARD, out ItemComponent? wornItem))
             {
                 if (wornItem.Owner.HasComponent<AccessComponent>())
                 {
                     UpgradeId(wornItem.Owner);
                 }
-                else if (wornItem.Owner.TryGetComponent(out PDAComponent pda))
+                else if (wornItem.Owner.TryGetComponent(out PDAComponent? pda))
                 {
                     if (pda.ContainedID == null)
                     {
@@ -158,7 +155,7 @@ namespace Content.Server.Sandbox
                 var access = id.GetComponent<AccessComponent>();
                 access.SetTags(allAccess);
 
-                if (id.TryGetComponent(out SpriteComponent sprite))
+                if (id.TryGetComponent(out SpriteComponent? sprite))
                 {
                     sprite.LayerSetState(0, "gold");
                 }
@@ -183,7 +180,7 @@ namespace Content.Server.Sandbox
 
             var player = _playerManager.GetSessionByChannel(message.MsgChannel);
 
-            _shell.ExecuteCommand(player, _conGroupController.CanCommand(player, "aghost") ? "aghost" : "ghost");
+            _host.ExecuteCommand(player, _conGroupController.CanCommand(player, "aghost") ? "aghost" : "ghost");
         }
 
         private void SandboxSuicideReceived(MsgSandboxSuicide message)
@@ -194,7 +191,7 @@ namespace Content.Server.Sandbox
             }
 
             var player = _playerManager.GetSessionByChannel(message.MsgChannel);
-            _shell.ExecuteCommand(player, "suicide");
+            _host.ExecuteCommand(player, "suicide");
         }
 
         private void UpdateSandboxStatusForAll()

@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Content.Server.Atmos;
-using Content.Server.GameObjects.Components.Body.Behavior;
-using Content.Server.GameObjects.Components.Body.Circulatory;
-using Content.Server.GameObjects.Components.Metabolism;
+using Content.Server.Body.Behavior;
+using Content.Server.Body.Circulatory;
+using Content.Server.Body.Respiratory;
 using Content.Shared.Atmos;
-using Content.Shared.GameObjects.Components.Body;
-using Content.Shared.GameObjects.Components.Body.Mechanism;
+using Content.Shared.Body.Components;
 using NUnit.Framework;
-using Robust.Server.Interfaces.Maps;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
+using Robust.Server.Maps;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
@@ -23,7 +21,7 @@ namespace Content.IntegrationTests.Tests.Body
     [TestOf(typeof(LungBehavior))]
     public class LungTest : ContentIntegrationTest
     {
-        private const string PROTOTYPES = @"
+        private const string Prototypes = @"
 - type: entity
   name: HumanBodyAndBloodstreamDummy
   id: HumanBodyAndBloodstreamDummy
@@ -34,7 +32,7 @@ namespace Content.IntegrationTests.Tests.Body
     template: HumanoidTemplate
     preset: HumanPreset
     centerSlot: torso
-  - type: Metabolism
+  - type: Respirator
     metabolismHeat: 5000
     radiatedHeat: 400
     implicitHeatRegulation: 5000
@@ -52,20 +50,20 @@ namespace Content.IntegrationTests.Tests.Body
         [Test]
         public async Task AirConsistencyTest()
         {
-            var options = new ServerContentIntegrationOption{ExtraPrototypes = PROTOTYPES};
+            var options = new ServerContentIntegrationOption{ExtraPrototypes = Prototypes};
             var server = StartServerDummyTicker(options);
 
             server.Assert(() =>
             {
                 var mapManager = IoCManager.Resolve<IMapManager>();
 
-                mapManager.CreateNewMapEntity(MapId.Nullspace);
+                var mapId = mapManager.CreateMap();
 
                 var entityManager = IoCManager.Resolve<IEntityManager>();
 
-                var human = entityManager.SpawnEntity("HumanBodyAndBloodstreamDummy", MapCoordinates.Nullspace);
+                var human = entityManager.SpawnEntity("HumanBodyAndBloodstreamDummy", new MapCoordinates(Vector2.Zero, mapId));
 
-                Assert.That(human.TryGetComponent(out IBody body));
+                Assert.That(human.TryGetComponent(out SharedBodyComponent body));
                 Assert.That(body.TryGetMechanismBehaviors(out List<LungBehavior> lungs));
                 Assert.That(lungs.Count, Is.EqualTo(1));
                 Assert.That(human.TryGetComponent(out BloodstreamComponent bloodstream));
@@ -107,7 +105,7 @@ namespace Content.IntegrationTests.Tests.Body
                 var exhaledOxygen = Math.Abs(lungOxygenBeforeExhale - lungOxygenAfterExhale);
 
                 // Not completely empty
-                Assert.Positive(lung.Air.Gases.Sum());
+                Assert.Positive(lung.Air.Moles.Sum());
 
                 // Retains needed gas
                 Assert.Positive(bloodstream.Air.GetMoles(Gas.Oxygen));
@@ -139,7 +137,9 @@ namespace Content.IntegrationTests.Tests.Body
         [Test]
         public async Task NoSuffocationTest()
         {
-            var server = StartServerDummyTicker();
+            var options = new ServerContentIntegrationOption{ExtraPrototypes = Prototypes};
+            var server = StartServerDummyTicker(options);
+
             await server.WaitIdleAsync();
 
             var mapLoader = server.ResolveDependency<IMapLoader>();
@@ -148,7 +148,7 @@ namespace Content.IntegrationTests.Tests.Body
 
             MapId mapId;
             IMapGrid grid = null;
-            MetabolismComponent metabolism = null;
+            RespiratorComponent respirator = null;
             IEntity human = null;
 
             var testMapName = "Maps/Test/Breathing/3by3-20oxy-80nit.yml";
@@ -165,12 +165,12 @@ namespace Content.IntegrationTests.Tests.Body
             {
                 var center = new Vector2(0.5f, -1.5f);
                 var coordinates = new EntityCoordinates(grid.GridEntityId, center);
-                human = entityManager.SpawnEntity("HumanMob_Content", coordinates);
+                human = entityManager.SpawnEntity("HumanBodyAndBloodstreamDummy", coordinates);
 
-                Assert.True(human.TryGetComponent(out IBody body));
+                Assert.True(human.TryGetComponent(out SharedBodyComponent body));
                 Assert.True(body.HasMechanismBehavior<LungBehavior>());
-                Assert.True(human.TryGetComponent(out metabolism));
-                Assert.False(metabolism.Suffocating);
+                Assert.True(human.TryGetComponent(out respirator));
+                Assert.False(respirator.Suffocating);
             });
 
             var increment = 10;
@@ -178,7 +178,7 @@ namespace Content.IntegrationTests.Tests.Body
             for (var tick = 0; tick < 600; tick += increment)
             {
                 await server.WaitRunTicks(increment);
-                Assert.False(metabolism.Suffocating, $"Entity {human.Name} is suffocating on tick {tick}");
+                Assert.False(respirator.Suffocating, $"Entity {human.Name} is suffocating on tick {tick}");
             }
 
             await server.WaitIdleAsync();

@@ -1,22 +1,18 @@
-﻿#nullable enable
-using System;
-using Content.Server.GameObjects.Components.Botany;
-using Content.Shared.Interfaces.Chemistry;
+﻿using System;
+using Content.Server.Botany.Components;
+using Content.Shared.Botany;
 using JetBrains.Annotations;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Random;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
-using Robust.Shared.Serialization;
+using Robust.Shared.Random;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.Chemistry.PlantMetabolism
 {
     [UsedImplicitly]
+    [DataDefinition]
     public class Clonexadone : IPlantMetabolizable
     {
-        public void ExposeData(ObjectSerializer serializer)
-        {
-        }
-
         public void Metabolize(IEntity plantHolder, float customPlantMetabolism = 1)
         {
             if (plantHolder.Deleted || !plantHolder.TryGetComponent(out PlantHolderComponent? plantHolderComp)

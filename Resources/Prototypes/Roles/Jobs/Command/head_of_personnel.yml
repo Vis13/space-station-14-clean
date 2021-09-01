@@ -1,10 +1,9 @@
 - type: job
   id: HeadOfPersonnel
   name: "head of personnel"
-  head: true
   positions: 1
   startingGear: HoPGear
-  department:
+  departments:
   - Command
   - Civilian
   icon: "HeadOfPersonnel"
@@ -28,3 +27,6 @@
     head: ClothingHeadHatHopcap
     idcard: HoPPDA
     ears: ClothingHeadsetAltCommand
+  innerclothingskirt: ClothingUniformJumpskirtHoP
+  satchel: ClothingBackpackSatchelFilled
+  duffelbag: ClothingBackpackDuffelFilled

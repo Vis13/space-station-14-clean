@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
-using Content.Server.Commands.GameTicking;
+using System;
+using System.Threading.Tasks;
 using Content.Server.GameTicking;
-using Content.Server.Interfaces.GameTicking;
+using Content.Server.GameTicking.Commands;
 using Content.Shared;
+using Content.Shared.CCVar;
 using NUnit.Framework;
-using Robust.Shared.Interfaces.Configuration;
-using Robust.Shared.Interfaces.GameObjects;
+using Robust.Shared.Configuration;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Timing;
 
 namespace Content.IntegrationTests.Tests.Commands
@@ -19,13 +20,19 @@ namespace Content.IntegrationTests.Tests.Commands
         [TestCase(false)]
         public async Task RestartRoundAfterStart(bool lobbyEnabled)
         {
-            var (_, server) = await StartConnectedServerClientPair();
+            var (_, server) = await StartConnectedServerClientPair(serverOptions: new ServerContentIntegrationOption
+            {
+                CVarOverrides =
+                {
+                    [CCVars.GameMap.Name] = "Maps/saltern.yml"
+                }
+            });
 
             await server.WaitIdleAsync();
 
-            var gameTicker = server.ResolveDependency<IGameTicker>();
             var configManager = server.ResolveDependency<IConfigurationManager>();
             var entityManager = server.ResolveDependency<IEntityManager>();
+            var gameTicker = entityManager.EntitySysManager.GetEntitySystem<GameTicker>();
 
             await server.WaitRunTicks(30);
 
@@ -40,7 +47,7 @@ namespace Content.IntegrationTests.Tests.Commands
                 tickBeforeRestart = entityManager.CurrentTick;
 
                 var command = new NewRoundCommand();
-                command.Execute(null, null, new string[] { });
+                command.Execute(null, string.Empty, Array.Empty<string>());
 
                 if (lobbyEnabled)
                 {

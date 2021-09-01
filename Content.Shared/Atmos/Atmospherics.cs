@@ -1,4 +1,7 @@
-﻿using Robust.Shared.Maths;
+using Robust.Shared.Maths;
+using Robust.Shared.Serialization;
+using System;
+// ReSharper disable InconsistentNaming
 
 namespace Content.Shared.Atmos
 {
@@ -139,14 +142,14 @@ namespace Content.Shared.Atmos
         #endregion
 
         /// <summary>
-        ///     Hard limit for tile equalization.
+        ///     Hard limit for zone-based tile equalization.
         /// </summary>
-        public const int ZumosHardTileLimit = 2000;
+        public const int MonstermosHardTileLimit = 2000;
 
         /// <summary>
         ///     Limit for zone-based tile equalization.
         /// </summary>
-        public const int ZumosTileLimit = 200;
+        public const int MonstermosTileLimit = 200;
 
         /// <summary>
         ///     Total number of gases. Increase this if you want to add more!
@@ -166,16 +169,16 @@ namespace Content.Shared.Atmos
         public const float FireMinimumTemperatureToExist = T0C + 100f;
         public const float FireMinimumTemperatureToSpread = T0C + 150f;
         public const float FireSpreadRadiosityScale = 0.85f;
-        public const float FirePhoronEnergyReleased = 3000000f;
+        public const float FirePlasmaEnergyReleased = 3000000f;
         public const float FireGrowthRate = 40000f;
 
         public const float SuperSaturationThreshold = 96f;
 
         public const float OxygenBurnRateBase = 1.4f;
-        public const float PhoronMinimumBurnTemperature = (100f+T0C);
-        public const float PhoronUpperTemperature = (1370f+T0C);
-        public const float PhoronOxygenFullburn = 10f;
-        public const float PhoronBurnRateDelta = 9f;
+        public const float PlasmaMinimumBurnTemperature = (100f+T0C);
+        public const float PlasmaUpperTemperature = (1370f+T0C);
+        public const float PlasmaOxygenFullburn = 10f;
+        public const float PlasmaBurnRateDelta = 9f;
 
         /// <summary>
         ///     This is calculated to help prevent singlecap bombs (Overpowered tritium/oxygen single tank bombs)
@@ -241,17 +244,32 @@ namespace Content.Shared.Atmos
         public const float HumanProducedOxygen = HumanNeededOxygen * 0.75f;
 
         public const float HumanProducedCarbonDioxide = HumanNeededOxygen * 0.25f;
+
+        #region Pipes
+
+        /// <summary>
+        ///     The pressure pumps and powered equipment max out at, in kPa.
+        /// </summary>
+        public const float MaxOutputPressure = 4500;
+
+        /// <summary>
+        ///     The maximum speed powered equipment can work at, in L/s.
+        /// </summary>
+        public const float MaxTransferRate = 200;
+
+        #endregion
     }
 
     /// <summary>
     ///     Gases to Ids. Keep these updated with the prototypes!
     /// </summary>
+    [Serializable, NetSerializable]
     public enum Gas : sbyte
     {
         Oxygen = 0,
         Nitrogen = 1,
         CarbonDioxide = 2,
-        Phoron = 3,
+        Plasma = 3,
         Tritium = 4,
         WaterVapor = 5,
     }

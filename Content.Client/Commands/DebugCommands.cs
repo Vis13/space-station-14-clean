@@ -1,12 +1,12 @@
-using Content.Client.GameObjects.Components;
-using Content.Client.GameObjects.EntitySystems;
-using Content.Client.Interfaces;
-using Content.Shared.GameObjects;
-using Robust.Client.Interfaces.Console;
-using Robust.Client.Interfaces.GameObjects.Components;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
+using System;
+using Content.Client.Markers;
+using Content.Client.Notifications.Managers;
+using Content.Shared.SubFloor;
+using Robust.Client.GameObjects;
+using Robust.Shared.Console;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
+using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 
 namespace Content.Client.Commands
 {
@@ -17,12 +17,10 @@ namespace Content.Client.Commands
         public string Description => "Toggles visibility of markers such as spawn points.";
         public string Help => "";
 
-        public bool Execute(IDebugConsole console, params string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             EntitySystem.Get<MarkerSystem>()
                 .MarkersVisible ^= true;
-
-            return false;
         }
     }
 
@@ -33,12 +31,10 @@ namespace Content.Client.Commands
         public string Description => "Makes entities below the floor always visible.";
         public string Help => $"Usage: {Command}";
 
-        public bool Execute(IDebugConsole console, params string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             EntitySystem.Get<SubFloorHideSystem>()
-                .EnableAll ^= true;
-
-            return false;
+                .ShowAll ^= true;
         }
     }
 
@@ -49,23 +45,21 @@ namespace Content.Client.Commands
         public string Description => "Makes entities below the floor always visible until the client is restarted.";
         public string Help => $"Usage: {Command}";
 
-        public bool Execute(IDebugConsole console, params string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             EntitySystem.Get<SubFloorHideSystem>()
-                .EnableAll = true;
+                .ShowAll = true;
 
             var components = IoCManager.Resolve<IEntityManager>().ComponentManager
-                .EntityQuery<SubFloorHideComponent>();
+                .EntityQuery<SubFloorHideComponent>(true);
 
             foreach (var component in components)
             {
-                if (component.Owner.TryGetComponent(out ISpriteComponent sprite))
+                if (component.Owner.TryGetComponent(out ISpriteComponent? sprite))
                 {
                     sprite.DrawDepth = (int) DrawDepth.Overlays;
                 }
             }
-
-            return false;
         }
     }
 
@@ -75,14 +69,12 @@ namespace Content.Client.Commands
         public string Description => "Send a notify client side.";
         public string Help => "notify <message>";
 
-        public bool Execute(IDebugConsole console, params string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             var message = args[0];
 
             var notifyManager = IoCManager.Resolve<IClientNotifyManager>();
             notifyManager.PopupMessage(message);
-
-            return false;
         }
     }
 
@@ -92,18 +84,22 @@ namespace Content.Client.Commands
         public string Description => "Creates and teleports you to a new uninitialized map for mapping.";
         public string Help => $"Usage: {Command} <mapname> / {Command} <id> <mapname>";
 
-        public bool Execute(IDebugConsole console, params string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             if (args.Length == 0)
             {
-                console.AddLine(Help);
-                return false;
+                shell.WriteLine(Help);
+                return;
             }
 
-            console.Commands["togglelight"].Execute(console);
-            console.Commands["showsubfloorforever"].Execute(console);
+#if DEBUG
+            shell.WriteError("WARNING: The client is using a debug build. You are risking losing your changes.");
+#endif
 
-            return true;
+            shell.ConsoleHost.RegisteredCommands["togglelight"].Execute(shell, string.Empty, Array.Empty<string>());
+            shell.ConsoleHost.RegisteredCommands["showsubfloorforever"].Execute(shell, string.Empty, Array.Empty<string>());
+
+            shell.RemoteExecuteCommand(argStr);
         }
     }
 }
